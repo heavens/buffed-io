@@ -1,0 +1,10 @@
+[package]
+name = "buffed-io"
+version = "0.0.1"
+edition = "2021"
+rust-version = "1.60"
+authors = ["Mack <https://github.com/heavens>"]
+license = "MIT OR Apache-2.0"
+keywords = ["buffer", "io", "bytes"]
+
+[dependencies]
