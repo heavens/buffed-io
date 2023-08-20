@@ -6,7 +6,7 @@ use std::ops::{Deref, Index, RangeFrom, RangeInclusive, RangeTo};
 
 use self::composite::read_u24;
 
-macro_rules! impl_get_bytebuf {
+macro_rules! impl_get_bytes {
     ($buf:ident, $byte_ty:ty, $conversion:expr) => {{
         const SIZE: usize = mem::size_of::<$byte_ty>();
         let limit = $buf.len();
@@ -21,7 +21,7 @@ macro_rules! impl_get_bytebuf {
     }};
 }
 
-macro_rules! impl_put_bytebuf {
+macro_rules! impl_put_bytes {
     ($this:tt, $value:tt) => {{
         let pos = $this.pos();
         let slice_len = $value.len();
@@ -63,25 +63,25 @@ impl Buffered<Bytes> {
     /// Attempts to return an unsigned byte from the reader, incrementing the position by `1` if successful. Otherwise
     /// an error is returned if not enough bytes remain.
     pub fn get_u8(&mut self) -> Result<u8> {
-        impl_get_bytebuf!(self, u8, u8::from_be_bytes)
+        impl_get_bytes!(self, u8, u8::from_be_bytes)
     }
 
     /// Attempts to return a signed byte from the reader, incrementing the position by `1` if successful. Otherwise
     /// an error is returned if not enough bytes remain.
     pub fn get_i8(&mut self) -> Result<i8> {
-        impl_get_bytebuf!(self, i8, i8::from_be_bytes)
+        impl_get_bytes!(self, i8, i8::from_be_bytes)
     }
 
     /// Attempts to return a signed short from the reader, incrementing the position by `2` if successful. Otherwise
     /// an error is returned if not enough bytes remain.
     pub fn get_i16(&mut self) -> Result<i16> {
-        impl_get_bytebuf!(self, i16, i16::from_be_bytes)
+        impl_get_bytes!(self, i16, i16::from_be_bytes)
     }
 
     /// Attempts to return an unsigned short from the reader, incrementing the position by `2` if successful. Otherwise
     /// an error is returned if not enough bytes remain.
     pub fn get_u16(&mut self) -> Result<u16> {
-        impl_get_bytebuf!(self, u16, u16::from_be_bytes)
+        impl_get_bytes!(self, u16, u16::from_be_bytes)
     }
 
     /// Attempts to return a 24-bit unsigned integer from the reader, incrementing the position by `3` if successful. Otherwise
@@ -99,25 +99,25 @@ impl Buffered<Bytes> {
     /// Attempts to return a signed integer from the reader, incrementing the position by `4` if successful. Otherwise
     /// an error is returned if not enough bytes remain.
     pub fn get_i32(&mut self) -> Result<i32> {
-        impl_get_bytebuf!(self, i32, i32::from_be_bytes)
+        impl_get_bytes!(self, i32, i32::from_be_bytes)
     }
 
     /// Attempts to return an unsigned integer from the reader, incrementing the position by `4` if successful. Otherwise
     /// an error is returned if not enough bytes remain.
     pub fn get_u32(&mut self) -> Result<u32> {
-        impl_get_bytebuf!(self, u32, u32::from_be_bytes)
+        impl_get_bytes!(self, u32, u32::from_be_bytes)
     }
 
     /// Attempts to return a signed long from the reader, incrementing the position by `8` if successful. Otherwise
     /// an error is returned if not enough bytes remain.
     pub fn get_i64(&mut self) -> Result<i64> {
-        impl_get_bytebuf!(self, i64, i64::from_be_bytes)
+        impl_get_bytes!(self, i64, i64::from_be_bytes)
     }
 
     /// Attempts to return an unsigned long from the reader, incrementing the position by `8` if successful. Otherwise
     /// an error is returned if not enough bytes remain.
     pub fn get_u64(&mut self) -> Result<u64> {
-        impl_get_bytebuf!(self, u64, u64::from_be_bytes)
+        impl_get_bytes!(self, u64, u64::from_be_bytes)
     }
 
     /// Tries to read a null-terminated string (c-string) from the reader, returning an error if the operation could not complete. The reader
@@ -139,54 +139,54 @@ impl Buffered<Bytes> {
     /// Writes an unsigned byte value into the buffer, incrementing the position by `1`.
     pub fn put_u8(&mut self, value: u8) {
         let slice = &u8::to_be_bytes(value);
-        impl_put_bytebuf!(self, slice)
+        impl_put_bytes!(self, slice)
     }
 
     /// Writes a signed byte value into the buffer, incrementing the position by `1`.
     pub fn put_i8(&mut self, value: i8) {
         let slice = &i8::to_be_bytes(value);
-        impl_put_bytebuf!(self, slice)
+        impl_put_bytes!(self, slice)
     }
 
     /// Writes a signed short value into the buffer, incrementing the position by `2`.
     pub fn put_i16(&mut self, value: i16) {
         let slice = &i16::to_be_bytes(value);
-        impl_put_bytebuf!(self, slice)
+        impl_put_bytes!(self, slice)
     }
 
     /// Writes an unsigned short value into the buffer, incrementing the position by `2`.
     pub fn put_u16(&mut self, value: u16) {
-        let slice = &u16::to_be_bytes(value);
-        impl_put_bytebuf!(self, slice)
+        let slice: &[u8; 2] = &u16::to_be_bytes(value);
+        impl_put_bytes!(self, slice)
     }
 
     pub fn put_u24(&mut self, value: u32) {
         let slice = &write_u24(value);
-        impl_put_bytebuf!(self, slice);
+        impl_put_bytes!(self, slice);
     }
 
     /// Writes a signed int value into the buffer, incrementing the position by `4`.
     pub fn put_i32(&mut self, value: i32) {
         let slice = &i32::to_be_bytes(value);
-        impl_put_bytebuf!(self, slice)
+        impl_put_bytes!(self, slice)
     }
 
     /// Writes an unsigned int value into the buffer, incrementing the position by `4`.
     pub fn put_u32(&mut self, value: u32) {
         let slice = &u32::to_be_bytes(value);
-        impl_put_bytebuf!(self, slice)
+        impl_put_bytes!(self, slice)
     }
 
     /// Writes an unsigned int value into the buffer, incrementing the position by `8`.
     pub fn put_u64(&mut self, value: u64) {
         let slice = &u64::to_be_bytes(value);
-        impl_put_bytebuf!(self, slice)
+        impl_put_bytes!(self, slice)
     }
 
     /// Writes a null-terminated string value into the buffer, incremeneting the position by `value.len() + 1`.
     pub fn put_str<S: AsRef<str>>(&mut self, value: S) {
         let bytes: &[u8] = value.as_ref().as_bytes();
-        impl_put_bytebuf!(self, bytes);
+        impl_put_bytes!(self, bytes);
         self.put_u8(0);
     }
 }
