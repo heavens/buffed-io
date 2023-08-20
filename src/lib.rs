@@ -23,6 +23,11 @@ pub trait ToSlice: Sized {
     /// Creates a slice containing all elements up until the range specified. This is equivalent to the interval notation `[0..end).`
     fn slice_to(&self, range: std::ops::RangeTo<usize>) -> Option<&[u8]>;
 
+    /// Used to optimistically assume sizes of a slice by using the size of a single item.
+    fn item_size_hint() -> usize {
+        0
+    }
+
     fn len(&self) -> usize;
 }
 
@@ -61,12 +66,13 @@ where
 
     /// Returns the index of the cursor within the buffer.
     pub fn index(&self) -> usize {
-        self.pos / size_hint::<T>()
+        self.pos / T::item_size_hint()
     }
 
     /// Advances the cursor forward by an order of magnitude of `amount * size_hint`.
     pub fn advance_index(&mut self, amount: usize) {
-        self.pos += amount * size_hint::<T>()
+        self.pos += amount * T::item_size_hint();
+        println!("Advancing cursor {}", self.pos);
     }
 
     /// Sets the cursor within the buffer to the specified index.

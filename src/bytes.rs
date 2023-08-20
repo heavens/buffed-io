@@ -9,9 +9,9 @@ use self::composite::read_u24;
 macro_rules! impl_get_bytebuf {
     ($buf:ident, $byte_ty:ty, $conversion:expr) => {{
         const SIZE: usize = mem::size_of::<$byte_ty>();
-        let limit = $buf.bytes_mut().len();
+        let limit = $buf.len();
         let pos = $buf.pos();
-        if pos + SIZE >= limit {
+        if pos + SIZE > limit {
             return Err(io::ErrorKind::UnexpectedEof.into());
         }
 
@@ -49,7 +49,7 @@ impl Bytes {
 }
 
 impl Buffered<Bytes> {
-    
+
     /// Returns an immutable reference to the underlying byte slice.
     pub fn bytes(&self) -> &[u8] {
         &self.buffer.bytes
@@ -200,6 +200,10 @@ impl ToSlice for Bytes {
         self.get(..range.end)
     }
 
+    fn item_size_hint() -> usize {
+        1
+    }
+
     fn len(&self) -> usize {
         self.bytes.len()
     }
@@ -271,7 +275,7 @@ impl Index<RangeFrom<usize>> for Bytes {
 }
 
 /// Composites used within buffer operations.
-pub mod composite {
+pub(crate) mod composite {
 
     /// A 3-byte composite emulating as a pod.
     /// Primarily serves as a helper to read from or write to a [Buf]/[BufMut] during io operations.
