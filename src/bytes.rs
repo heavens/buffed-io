@@ -277,19 +277,16 @@ impl Index<RangeFrom<usize>> for Bytes {
 /// Composites used within buffer operations.
 pub(crate) mod composite {
 
-    /// A 3-byte composite emulating as a pod.
-    /// Primarily serves as a helper to read from or write to a [Buf]/[BufMut] during io operations.
+    /// A 3-byte composite acting as a pod.
     #[allow(non_camel_case_types)]
     pub type u24 = &'static [u8; 3];
 
-    /// A helper function reading a 24-bit value from the byte slice. This function should stay hidden as it is intended to be used
-    /// internally by reader and writers apart of the public api.
+    /// A helper function reading a 24-bit value from the byte slice.
     pub(crate) fn read_u24(buf: &[u8]) -> usize {
         (((buf[0] as u32) << 16) + ((buf[1] as u32) << 8) + (buf[2] as u32 & 255)) as usize
     }
 
-    /// A helper function writing a 24-bit value into a fixed-length byte slice. This function should stay hidden as it is intended to be used
-    /// internally by reader and writers apart of the public api.
+    /// A helper function writing a 24-bit value into a fixed-length byte slice.
     pub(crate) fn write_u24(value: u32) -> [u8; 3] {
         let mut bytes = [0u8; 3];
         bytes[0] = (value >> 16) as u8;
