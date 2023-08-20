@@ -72,7 +72,6 @@ where
     /// Advances the cursor forward by an order of magnitude of `amount * size_hint`.
     pub fn advance_index(&mut self, amount: usize) {
         self.pos += amount * T::item_size_hint();
-        println!("Advancing cursor {}", self.pos);
     }
 
     /// Sets the cursor within the buffer to the specified index.
