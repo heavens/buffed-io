@@ -114,3 +114,25 @@ where
 fn size_hint<T: ToSlice + Sized>() -> usize {
     std::mem::size_of::<T>()
 }
+
+
+#[cfg(test)]
+mod tests {
+    use crate::{Buffered, bytes::Bytes};
+
+    #[test]
+    pub fn single_read() {
+        let mut bytes = Buffered::new(Bytes::new(vec![10u8]));
+        let value = bytes.get_u8().expect("read first entry");
+        assert!(value == 10)
+    }
+
+    #[test]
+    pub fn throw_eof() {
+        let mut bytes = Buffered::new(Bytes::new(vec![10u8]));
+        assert!(bytes.is_available(1));
+        bytes.get_i8().expect("read first entry");
+        assert!(bytes.remaining() == 0);
+        bytes.get_u8().expect("eof");
+    }
+}
