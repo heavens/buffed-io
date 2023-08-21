@@ -118,10 +118,27 @@ where
     }
 }
 
+pub struct Logger;
+
+impl log::Log for Logger {
+    fn enabled(&self, _metadata: &log::Metadata) -> bool {
+        true
+    }
+
+    fn log(&self, record: &log::Record) {
+        println!("[{}] {:?}", record.level(), record.line());
+    }
+
+    fn flush(&self) {
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
-    use crate::{Buffered, bytes::Bytes};
+    use std::env;
+
+    use crate::{Buffered, bytes::Bytes, Logger};
 
     #[test]
     pub fn single_read() {
@@ -132,7 +149,7 @@ mod tests {
 
     #[test]
     pub fn default_read() {
-        let bytebuffer = Buffered::<Bytes>::new();
+        let bytebuffer: Buffered<Bytes> = Buffered::<Bytes>::new();
         assert!(bytebuffer.is_empty())
     }
 
