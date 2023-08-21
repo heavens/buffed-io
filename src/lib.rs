@@ -39,22 +39,30 @@ pub struct Buffered<T: ToSlice> {
 
 impl<T> Buffered<T>
 where
-    T: ToSlice,
+    T: ToSlice + Default,
 {
     /// Constructs a new buffer, using the provided vector as the initial contents and cursor position starting at 0.
-    pub fn new(container: T) -> Self {
+    pub fn with_content(container: T) -> Self {
         Self {
             buffer: container,
             pos: 0,
         }
     }
 
-    /// Returns an immutable reference to the underlying `ToSlice` implementor for the buffer.
+    /// Constructs a new buffer whose contents are initialized using the designated [Default](std::default::Default) implementation of type `T`.
+    pub fn new() -> Self {
+        Self {
+            buffer: T::default(),
+            pos: 0,
+        }
+    }
+
+    /// Returns an immutable reference to the underlying [ToSlice] implementor for the buffer.
     pub fn get_inner(&self) -> &T {
         &self.buffer
     }
 
-    /// Returns a mutable reference to the underlying `ToSlice` implementor for the buffer.
+    /// Returns a mutable reference to the underlying [ToSlice] implementor for the buffer.
     pub fn get_inner_mut(&mut self) -> &mut T {
         &mut self.buffer
     }
@@ -108,12 +116,6 @@ where
     }
 }
 
-/// Returns the size of an invidual item within the buffer. Implementors may override the default behavior, backed by `mem::size_of`,
-/// in order to more accurately specify a non-POD type.
-fn size_hint<T: ToSlice + Sized>() -> usize {
-    std::mem::size_of::<T>()
-}
-
 
 #[cfg(test)]
 mod tests {
@@ -121,14 +123,20 @@ mod tests {
 
     #[test]
     pub fn single_read() {
-        let mut bytes = Buffered::new(Bytes::new(vec![10u8]));
+        let mut bytes = Buffered::<Bytes>::with_content(Bytes::new(vec![10u8]));
         let value = bytes.get_u8().expect("read first entry");
         assert!(value == 10)
     }
 
     #[test]
+    pub fn default_read() {
+        let bytebuffer = Buffered::<Bytes>::new();
+        assert!(bytebuffer.is_empty())
+    }
+
+    #[test]
     pub fn throw_eof() {
-        let mut bytes = Buffered::new(Bytes::new(vec![10u8]));
+        let mut bytes = Buffered::with_content(Bytes::new(vec![10u8]));
         assert!(bytes.is_available(1));
         bytes.get_i8().expect("read first entry");
         assert!(bytes.remaining() == 0);

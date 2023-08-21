@@ -35,13 +35,12 @@ macro_rules! impl_put_bytes {
     }};
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, Default)]
 pub struct Bytes {
     bytes: Vec<u8>,
 }
 
 impl Bytes {
-
     /// Constructs a new byte buffer using the provided vector as the initial contents.
     pub fn new(contents: Vec<u8>) -> Self {
         Self { bytes: contents }
@@ -49,7 +48,6 @@ impl Bytes {
 }
 
 impl Buffered<Bytes> {
-
     /// Returns an immutable reference to the underlying byte slice.
     pub fn bytes(&self) -> &[u8] {
         &self.buffer.bytes
@@ -139,25 +137,25 @@ impl Buffered<Bytes> {
     /// Writes an unsigned byte value into the buffer, incrementing the position by `1`.
     pub fn put_u8(&mut self, value: u8) {
         let slice = &u8::to_be_bytes(value);
-        impl_put_bytes!(self, slice)
+        impl_put_bytes!(self, slice);
     }
 
     /// Writes a signed byte value into the buffer, incrementing the position by `1`.
     pub fn put_i8(&mut self, value: i8) {
         let slice = &i8::to_be_bytes(value);
-        impl_put_bytes!(self, slice)
+        impl_put_bytes!(self, slice);
     }
 
     /// Writes a signed short value into the buffer, incrementing the position by `2`.
     pub fn put_i16(&mut self, value: i16) {
         let slice = &i16::to_be_bytes(value);
-        impl_put_bytes!(self, slice)
+        impl_put_bytes!(self, slice);
     }
 
     /// Writes an unsigned short value into the buffer, incrementing the position by `2`.
     pub fn put_u16(&mut self, value: u16) {
         let slice: &[u8; 2] = &u16::to_be_bytes(value);
-        impl_put_bytes!(self, slice)
+        impl_put_bytes!(self, slice);
     }
 
     pub fn put_u24(&mut self, value: u32) {
@@ -168,19 +166,19 @@ impl Buffered<Bytes> {
     /// Writes a signed int value into the buffer, incrementing the position by `4`.
     pub fn put_i32(&mut self, value: i32) {
         let slice = &i32::to_be_bytes(value);
-        impl_put_bytes!(self, slice)
+        impl_put_bytes!(self, slice);
     }
 
     /// Writes an unsigned int value into the buffer, incrementing the position by `4`.
     pub fn put_u32(&mut self, value: u32) {
         let slice = &u32::to_be_bytes(value);
-        impl_put_bytes!(self, slice)
+        impl_put_bytes!(self, slice);
     }
 
     /// Writes an unsigned int value into the buffer, incrementing the position by `8`.
     pub fn put_u64(&mut self, value: u64) {
         let slice = &u64::to_be_bytes(value);
-        impl_put_bytes!(self, slice)
+        impl_put_bytes!(self, slice);
     }
 
     /// Writes a null-terminated string value into the buffer, incremeneting the position by `value.len() + 1`.
