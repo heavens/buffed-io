@@ -28,6 +28,7 @@ pub trait ToSlice: Sized {
         0
     }
 
+    /// Returns the count of items within the container.
     fn len(&self) -> usize;
 }
 
@@ -42,10 +43,10 @@ where
     T: ToSlice + Default,
 {
     /// Constructs a new buffer, using the provided vector as the initial contents and cursor position starting at 0.
-    pub fn with_content(container: T) -> Self {
+    pub fn using(container: T) -> Self {
         Self {
-            buffer: container,
             pos: 0,
+            buffer: container,
         }
     }
 
@@ -53,7 +54,7 @@ where
     pub fn new() -> Self {
         Self {
             buffer: T::default(),
-            pos: 0,
+            pos: 0
         }
     }
 
@@ -87,6 +88,7 @@ where
         self.pos = index;
     }
 
+    /// Returns the remaining space available within the buffer.
     pub fn remaining(&self) -> usize {
         self.buffer.len() - self.pos
     }
@@ -123,7 +125,7 @@ mod tests {
 
     #[test]
     pub fn single_read() {
-        let mut bytes = Buffered::<Bytes>::with_content(Bytes::new(vec![10u8]));
+        let mut bytes = Buffered::<Bytes>::using(Bytes::new(vec![10u8]));
         let value = bytes.get_u8().expect("read first entry");
         assert!(value == 10)
     }
@@ -136,7 +138,7 @@ mod tests {
 
     #[test]
     pub fn throw_eof() {
-        let mut bytes = Buffered::with_content(Bytes::new(vec![10u8]));
+        let mut bytes: Buffered<Bytes> = Buffered::using(vec![10u8].into());
         assert!(bytes.is_available(1));
         bytes.get_i8().expect("read first entry");
         assert!(bytes.remaining() == 0);

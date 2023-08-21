@@ -12,6 +12,7 @@ macro_rules! impl_get_bytes {
         let limit = $buf.len();
         let pos = $buf.pos();
         if pos + SIZE > limit {
+            log::debug!("pos: {}, size: {}", pos, SIZE);
             return Err(io::ErrorKind::UnexpectedEof.into());
         }
 
