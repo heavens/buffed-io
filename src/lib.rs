@@ -31,7 +31,7 @@ pub trait ToSlice: Sized {
     fn len(&self) -> usize;
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Buffered<T: ToSlice> {
     buffer: T,
     pos: usize,

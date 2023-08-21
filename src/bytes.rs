@@ -35,7 +35,7 @@ macro_rules! impl_put_bytes {
     }};
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Bytes {
     bytes: Vec<u8>,
 }
@@ -276,10 +276,6 @@ impl Index<RangeFrom<usize>> for Bytes {
 
 /// Composites used within buffer operations.
 pub(crate) mod composite {
-
-    /// A 3-byte composite acting as a pod.
-    #[allow(non_camel_case_types)]
-    pub type u24 = &'static [u8; 3];
 
     /// A helper function reading a 24-bit value from the byte slice.
     pub(crate) fn read_u24(buf: &[u8]) -> usize {
